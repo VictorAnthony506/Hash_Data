@@ -35,8 +35,7 @@ def output_csv(csv_file_path, show_json="n"):
     semi_colon = df["Attributes"].str.split(";")
     team_names = df["TEAM NAMES"]
     team_names.ffill(inplace=True)
-    
-    
+
     for member in range(len(df)):
         minting_tool = team_names.iloc[member]   
         member_details = {           
