@@ -15,7 +15,7 @@ def dict_hash(dictionary: Dict[str, Any]) -> str:
 
 
 """Line 17, Attribute Colomn: data was not well separated with semi colon"""
-# defining a constant for that field LINE17ATTRIBUTE
+# defining a constant for that field LINE17ATTRIBUTE.
 LINE17ATTRIBUTE = [
     {
         "trait_type": "hair", "value": "bald",
