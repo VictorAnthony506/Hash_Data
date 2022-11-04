@@ -14,41 +14,66 @@ def dict_hash(dictionary: Dict[str, Any]) -> str:
     return dhash.hexdigest()
 
 
-def output_csv(csv_file_path, output_csv_path, minting_tool=''):
+"""Line 17, Attribute Colomn: data was not well separated with semi colon"""
+# defining a constant for that field
+LINE17ATTRIBUTE = [
+    {
+        "trait_type": "hair", "value": "bald",
+        "trait_type": "eyes", "value": "black",
+        "trait_type": "teeth", "value": "none",
+        "trait_type": "clothing", "value":"yellow and purple agbada",
+        "trait_type": "accessories", "value": "mask",
+        "trait_type": "expression", "value": "none",
+        "trait_type": "strength", "value": "none",
+        "trait_type": "weakness", "value": "none"
+    }
+]
+
+
+def output_csv(csv_file_path, show_json="n"):
     df = pd.read_csv(csv_file_path)
-    dname = 'Current Name' if 'Current Name' in df.columns else 'Filename'
-    
-    
     hash_list = []
+    semi_colon, team_names = pd.DataFrame(), pd.DataFrame()
+    semi_colon = df["Attributes"].str.split(";")
+    team_names = df["TEAM NAMES"]
+    team_names.ffill(inplace=True)
+    
     
     for member in range(len(df)):
-        member_details = {
-        "format": "CHIP-0007",
-        "name": df[dname].iloc[member],
-        "description": df['Description'].iloc[member],
-        "minting_tool": minting_tool,
-        "sensitive_content": True,
-        "series_number": member,
-        "series_total": len(df),
-        "collection": {
-            "name": df[dname].iloc[member],
-            "id": df['UUID'].iloc[member],
-            "gender": df['Gender'].iloc[member] if 'Gender' in df.columns else None,
-            "attributes": []
-        },
-        "other_data": {
-            "Descriptor": df['Descriptor'].iloc[member] if 'Descriptor' in df.columns else "",
-            "New Name": df["New Name"].iloc[member] if 'New Name' in df.columns else ""
-            }
-        }
+        minting_tool = team_names.iloc[member]   
+        member_details = {           
+            "format": "CHIP-0007",
+            "name": df["Filename"].iloc[member],
+            "description": df['Description'].iloc[member],
+            "minting_tool": minting_tool,
+            "sensitive_content": False,
+            "series_number": member,
+            "series_total": len(df),
+            "attributes": [{"trait_type": o.split(":")[0], "value": o.split(":")[1]} for o in semi_colon.iloc[member]] if member!=17 else LINE17ATTRIBUTE,
+            "collection": {
+                "name": "Zuri NFT Tickets for Free Lunch",
+                "id": "b774f676-c1d5-422e-beed-00ef5510c64d",
+                "attributes": [
+                    {
+                        "type": "description",
+                        "value": "Rewards for accomplishments during HNGi9."
+                    }
+                    ]
+                }
+                }
         
+        if show_json=="y":
+            print(member_details)
+            
+                
         hash_list.append(dict_hash(member_details))
         
     df["Hash"] = hash_list
-    df.to_csv(output_csv_path)
+    df.to_csv("filename.output.csv", index=False)
     
     
 file_path = input('Enter the absolute path of the CSV file: ')
-output_path = input('Enter the absolute path of the output file')
-output_csv(file_path, output_path)
+show = input("Do you want to see json output: [y/n]:")
+
+output_csv(file_path, show)
 
